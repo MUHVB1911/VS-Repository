@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Dodger Game</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #111;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        #game {
+            border: 4px solid #4caf50;
+            background: #000;
+            display: block;
+        }
+        #info {
+            text-align: center;
+            margin-top: 10px;
+        }
+        button {
+            padding: 10px 16px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            background: #4caf50;
+            color: #111;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="game" width="600" height="400"></canvas>
+    <div id="info">
+        <div>Score: <span id="score">0</span></div>
+        <button id="restart">Restart</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("game");
+        const ctx = canvas.getContext("2d");
+        const scoreEl = document.getElementById("score");
+        const restartBtn = document.getElementById("restart");
+
+        const player = {
+            x: 280,
+            y: 340,
+            size: 30,
+            speed: 5,
+        };
+
+        let enemies = [];
+        let score = 0;
+        let gameOver = false;
+        let frame = 0;
+
+        function reset() {
+            player.x = 280;
+            player.y = 340;
+            enemies = [];
+            score = 0;
+            frame = 0;
+            gameOver = false;
+            scoreEl.textContent = score;
+            requestAnimationFrame(loop);
+        }
+
+        function spawnEnemy() {
+            const size = 20 + Math.random() * 20;
+            enemies.push({
+                x: Math.random() * (canvas.width - size),
+                y: -size,
+                size,
+                speed: 2 + Math.random() * 2,
+            });
+        }
+
+        function drawPlayer() {
+            ctx.fillStyle = "#4caf50";
+            ctx.fillRect(player.x, player.y, player.size, player.size);
+        }
+
+        function drawEnemies() {
+            ctx.fillStyle = "#ff5722";
+            enemies.forEach(enemy => {
+                ctx.fillRect(enemy.x, enemy.y, enemy.size, enemy.size);
+            });
+        }
+
+        function updateEnemies() {
+            enemies.forEach(enemy => {
+                enemy.y += enemy.speed;
+            });
+            enemies = enemies.filter(enemy => {
+                if (enemy.y > canvas.height) {
+                    score += 1;
+                    scoreEl.textContent = score;
+                    return false;
+                }
+                return true;
+            });
+        }
+
+        function checkCollision() {
+            for (const enemy of enemies) {
+                if (
+                    player.x < enemy.x + enemy.size &&
+                    player.x + player.size > enemy.x &&
+                    player.y < enemy.y + enemy.size &&
+                    player.y + player.size > enemy.y
+                ) {
+                    gameOver = true;
+                    break;
+                }
+            }
+        }
+
+        function drawGameOver() {
+            ctx.fillStyle = "rgba(0,0,0,0.7)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#fff";
+            ctx.font = "32px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2 - 10);
+            ctx.font = "18px Arial";
+            ctx.fillText("Press Restart to play again", canvas.width / 2, canvas.height / 2 + 30);
+        }
+
+        function loop() {
+            if (gameOver) {
+                drawGameOver();
+                return;
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            frame += 1;
+
+            if (frame % 60 === 0) {
+                spawnEnemy();
+            }
+
+            updateEnemies();
+            drawPlayer();
+            drawEnemies();
+            checkCollision();
+
+            requestAnimationFrame(loop);
+        }
+
+        window.addEventListener("keydown", event => {
+            if (gameOver) return;
+            const key = event.key;
+            if (key === "d" && player.x > 0) {
+                player.x -= player.speed;
+            }
+            if (key === "a" && player.x + player.size < canvas.width) {
+                player.x += player.speed;
+            }
+            if (key === "w" && player.y > 0) {
+                player.y -= player.speed;
+            }
+            if (key === "s" && player.y + player.size < canvas.height) {
+                player.y += player.speed;
+            }
+        });
+
+        restartBtn.addEventListener("click", reset);
+
+        reset();
+    </script>
+</body>
+</html>
