@@ -1,8 +1,18 @@
-.container {
-  background-color: rgb(133, 87, 27);
-  display: flex;          /* يخلي العناصر جنب بعض */
-  justify-content: center;          /* يخلي العناصر جنب بعض */
-  gap: 75px;              /* مسافة بين الأزرار */
-  flex-wrap: wrap;        /* لو المكان ضيق ينزلوا سطر تاني */
+*{
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 }
-
+body{
+    background-image: linear-gradient(white,red);
+    height: 100vh;
+}
+.logo{
+    color: rgb(155, 27, 27);
+}
+nav{
+    display: 10px;
+    justify-content: space-around;
+    align-items: right;
+    background-color: liner-gradient(white,red);
+    height: 10vh;
+    nav-left: auto;
+}
